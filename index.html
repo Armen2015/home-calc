@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .form-group {
+                display: flex;
+                column-gap: 20px;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .label-group {
+                display: flex;
+                flex-direction: column;
+            }
+            .label-group label {
+                font-size: 12px;
+                font-weight: bold;
+                margin-top: 5px;
+            }
+
+            .calc-value {
+                padding-top: 18px;
+                color: gray;
+            }
+
+            .title {
+                font-size: 12px;
+                font-weight: bold;
+                width: 100%;
+                padding: 5px 0;
+                color: gray;
+            }
+
+            .itog {
+                display: flex;
+                align-items: center;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            .itog span {
+                font-size: 16px;
+                font-weight: 100;
+                color: gray;
+            }
+
+            body {
+                zoom: 2;
+            }
+
+            @media only screen and (max-width: 992px) {
+                body {
+                    /* zoom: 2.9; */
+                }
+            }
+        </style>
+    </head>
+<body>
+
+<br>
+<div class="form-group">
+    <div class="label-group">
+        <label>Max բյուջե (AMD)։</label>
+        <input type="text" id="tanMaxGin" oninput="onHandler('tanMaxGin',  event.target.value)">
+    </div>
+    <div class="label-group">
+        <label>Հիմա վերցնելուց Max ավել տալու գնի սահման (AMD)։</label>
+        <input type="text" id="maxAvel" oninput="onHandler('maxAvel',  event.target.value)">
+    </div>
+</div>
+<br>
+<div class="form-group">
+    <div class="title">Վերցնել հիմա</div>
+    <div class="label-group">
+        <label>Ք.Մ․ Գին:</label>
+        <input type="text" id="qmGin1" oninput="onHandler('qmGin1',  event.target.value)">
+    </div>
+    
+    <div class="label-group">
+        <label>Ք.Մ.:</label>
+        <input type="text" id="qm1" oninput="onHandler('qm1', event.target.value)">
+    </div>
+
+    <div id="himaObshi" class="calc-value"></div>
+</div>
+
+<br>
+<div class="form-group">
+    <div class="title">Վերցնել հետո</div>
+    <div class="label-group">
+        <label>Ք.Մ․ Գին:</label>
+        <input type="text" id="qmGin2" oninput="onHandler('qmGin2',  event.target.value)">
+    </div>
+    
+    <div class="label-group">
+        <label>Ք.Մ.:</label>
+        <input type="text" id="qm2" oninput="onHandler('qm2', event.target.value)">
+    </div>
+
+    <div id="hetoObshi" class="calc-value"></div>
+</div>
+<br>
+<div class="form-group">
+    <!-- <div class="title">Վարձով վերցնելու սկիզբ</div> -->
+    <div class="label-group">
+        <label>Վարձով վերցնելու սկիզբ:</label>
+        <input type="date" id="vardzSkizb" oninput="onHandler('vardzSkizb',  event.target.value, true)">
+    </div>
+    
+    <div class="label-group">
+        <label>Հետո վերցնելու տան ամսաթիվ:</label>
+        <input type="date" id="hetoAmsativ" oninput="onHandler('hetoAmsativ',  event.target.value, true)">
+    </div>
+
+    <div id="amisneriQanak" class="calc-value"></div>
+</div>
+<br>
+<div class="form-group">
+    <div class="label-group">
+        <label>Վարձ ամսավճար։</label>
+        <input type="text" id="amsavchar" oninput="onHandler('amsavchar',  event.target.value)">
+    </div>
+    
+    <div class="label-group">
+        <label>Ամիսների Քանակ + 3(ռեմոնտ)։</label>
+        <input type="text" id="amqanak" oninput="onHandler('amQanak', event.target.value)">
+    </div>
+
+    <div id="vardzagumar" class="calc-value"></div>
+</div>
+<br>
+
+<hr>
+<div>
+    <div id="tunplusvardz" class="itog"></div>
+    <div id="himatun" class="itog"></div>
+    <span id="tarberutyun" class="itog"></span>
+</div>
+
+<script>
+    const data = {
+        amsavchar: 250000,
+        amQanak: 18,
+        qmGin1: 510000,
+        qm1: 92,
+        qmGin2: 450000,
+        qm2: 92,
+
+        obshi1: 0,
+        obhsi2: 0,
+
+        vardzSkizb: '2024-07-01',
+        hetoAmsativ: '2025-08-01',
+
+        amisneriQanak: 0,
+        maxAvel: 2000000,
+        tanMaxGin: 46000000
+        
+    }
+    const amsavcharInp = document.getElementById('amsavchar');
+    const amqanakInp = document.getElementById('amqanak');
+    const vardzagumar = document.getElementById('vardzagumar');
+    const qmGin1Inp = document.getElementById('qmGin1');
+    const qm1Inp = document.getElementById('qm1');
+    const himaObshi = document.getElementById('himaObshi');
+    const qmGin2Inp = document.getElementById('qmGin2');
+    const qm2Inp = document.getElementById('qm2');
+    const hetoObshi = document.getElementById('hetoObshi');
+    const vardzSkizbInp = document.getElementById('vardzSkizb');
+    const hetoAmsativInp = document.getElementById('hetoAmsativ');
+    const amisneriQanak = document.getElementById('amisneriQanak');
+    const tunplusvardz = document.getElementById('tunplusvardz');
+    const himatun = document.getElementById('himatun');
+    const maxAvelInp = document.getElementById('maxAvel');
+    const tanMaxGinInp = document.getElementById('tanMaxGin');
+
+    function init() {
+        amsavcharInp.value = data.amsavchar;
+        amqanakInp.value = data.amQanak;
+
+        qmGin1Inp.value = data.qmGin1;
+        qm1Inp.value = data.qm1;
+
+        qmGin2Inp.value = data.qmGin2;
+        qm2Inp.value = data.qm2;
+
+        vardzSkizbInp.value = data.vardzSkizb;
+        hetoAmsativInp.value = data.hetoAmsativ;
+        maxAvelInp.value = data.maxAvel;
+        tanMaxGinInp.value = data.tanMaxGin;
+        calc();
+    }
+
+    function calc() {
+        data.obshi1 = data.qmGin1 * data.qm1;
+        data.obshi2 = data.qmGin2 * data.qm2;
+        data.amisneriQanak = getMonthsCount(data.vardzSkizb, data.hetoAmsativ);
+        data.amQanak = data.amisneriQanak + 3;
+        amqanakInp.value = data.amQanak;
+
+        vardzagumar.innerText = '= ' + convert(data.amsavchar * data.amQanak);
+        himaObshi.innerHTML = '= &nbsp;' + `<span style="color: ${data.obshi1 <= data.tanMaxGin ? 'gray' : 'red'}"> ${convert(data.obshi1)}</span>`;
+        hetoObshi.innerHTML = '= &nbsp;' + `<span style="color: ${data.obshi2 <= data.tanMaxGin ? 'gray' : 'red'}"> ${convert(data.obshi2)}</span>`;
+        amisneriQanak.innerText = '= ' +  data.amisneriQanak  + ' ամիս';
+
+
+        const himaplus3amis = data.obshi1 + data.amsavchar * 3;
+        const hetoTunPlusVardz = data.obshi2 + data.amsavchar * data.amQanak;
+        const tarberut = himaplus3amis - hetoTunPlusVardz;
+        tunplusvardz.innerHTML = 'Հետո․ Տուն + Վարձ =&nbsp;' + 
+        `<span style="color: ${hetoTunPlusVardz <= data.tanMaxGin ? 'green' : 'red'}"> ${convert(hetoTunPlusVardz)}</span>`;
+        himatun.innerHTML = 'Հիմա․ Տուն + 3 ամիս վարձ(ռեմոնտ) =&nbsp;' + 
+        `<span style="color: ${himaplus3amis <= data.tanMaxGin ? 'green' : 'red'}"> ${convert(himaplus3amis)}</span>`;
+        tarberutyun.innerHTML = 'Հիմա վերցնելուց եսքան ավելա կայնում =&nbsp;' + 
+        `<span style="color: ${tarberut <= data.maxAvel ? 'green' : 'red'}"> ${convert(tarberut)}</span>`;
+    }
+
+    function onHandler(key, val, isDate) {
+        console.log(key, val);
+        if(isDate) {
+            data[key] = val
+        } else {
+            data[key] = val ? +val : 0;
+        }
+        calc();
+    }
+
+    function convert(val) {
+        return new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'AMD' })
+        .format(val);
+    }
+
+    function getMonthsCount(startDate, endDate) {
+        var start      = startDate.split('-');
+        var end        = endDate.split('-');
+        var startYear  = parseInt(start[0]);
+        var endYear    = parseInt(end[0]);
+        var dates      = [];
+
+        for(var i = startYear; i <= endYear; i++) {
+            var endMonth = i != endYear ? 11 : parseInt(end[1]) - 1;
+            var startMon = i === startYear ? parseInt(start[1])-1 : 0;
+            for(var j = startMon; j <= endMonth; j = j > 12 ? j % 12 || 11 : j+1) {
+            var month = j+1;
+            var displayMonth = month < 10 ? '0'+month : month;
+            dates.push([i, displayMonth, '01'].join('-'));
+            }
+        }
+        return dates.length;
+    }
+
+    init();
+</script>
+</body>
+</html>
